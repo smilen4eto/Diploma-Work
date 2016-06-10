@@ -1,9 +1,12 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import com.sun.jersey.core.util.Base64;
 
 public class User {
 	int id;
@@ -58,11 +61,25 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+//    get
+//    {
+//        var bytes = Convert.FromBase64String(model.Password);
+//        return Encoding.UTF8.GetString(bytes);
+//    }
+//    set
+//    {
+//        var bytes = Encoding.UTF8.GetBytes(value);
+//        model.Password = Convert.ToBase64String(bytes);
+//    }
+	
 	public String getPassword() {
-		return password;
+		byte[] decoded = Base64.decode(this.password.getBytes());
+		return Arrays.toString(decoded);
 	}
 	public void setPassword(String password) {
-		this.password = password;
+		byte[] encoded = Base64.encode(password.getBytes());
+		this.password = Arrays.toString(encoded);
 	}
 	public Language getMainLanguage() {
 		return mainLanguage;
