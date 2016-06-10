@@ -8,15 +8,17 @@ public class Word {
 	int level;
 	int timesAnsCorr;
 	int timesAnsWrong;
+	String wordInMainLanguage;
+	String wordInEnglish;
 	Language lang;
 	Map<String, Boolean> word;
 	
-	public Word(int id, int level, int timesAnsCorr, int timesAnsWrong,
-			Language lang) {
-		setId(id);
+	public Word(int level, int timesAnsCorr, int timesAnsWrong,
+			Language lang, String wordInMainLanguage) {
 		setLevel(level);
-		setTimesAnsCorr(timesAnsCorr);
-		setTimesAnsWrong(timesAnsWrong);
+		setTimesAnsCorr(0);
+		setTimesAnsWrong(0);
+		setWordInMainLanguage(wordInMainLanguage);
 		setLang(lang);
 		word = new HashMap<String, Boolean>();
 	}
@@ -62,6 +64,23 @@ public class Word {
 		this.word = word;
 	}
 	
+	
+	public String getWordInMainLanguage() {
+		return wordInMainLanguage;
+	}
+
+	public void setWordInMainLanguage(String wordInMainLanguage) {
+		this.wordInMainLanguage = wordInMainLanguage;
+	}
+
+	public String getWordInEnglish() {
+		return wordInEnglish;
+	}
+
+	public void setWordInEnglish(String wordInEnglish) {
+		this.wordInEnglish = wordInEnglish;
+	}
+
 	public Map<String, Boolean> getWord() {
 		return word;
 	}
