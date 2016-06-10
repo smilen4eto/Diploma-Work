@@ -21,9 +21,8 @@ public class User {
 	Boolean repeatWronWords;
 	float score;
 		
-	public User(int id, String name, String username, String email,
+	public User(String name, String username, String email,
 			String password) {
-		setId(id);
 		setName(name);
 		setUsername(username);
 		setEmail(email);
