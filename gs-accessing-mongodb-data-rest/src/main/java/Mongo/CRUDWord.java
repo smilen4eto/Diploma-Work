@@ -7,6 +7,7 @@ import Model.Language;
 import Model.Word;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public class CRUDWord {
 	public static void insertQueryWord(Word word){
@@ -35,7 +36,9 @@ public class CRUDWord {
 			new BasicDBObject("$set", new BasicDBObject("word_lang", wordDetail)));
 	}
 	
-	public static Word getWordInLanguage(String language){
+	public static DBObject getWordInLanguage(String language, String mainLanguage){
 		return null;
+//		DBObject word = Connector.usersColl.findOne(new BasicDBObject("username", username));
+		
 	}
 }
