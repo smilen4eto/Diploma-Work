@@ -1,6 +1,5 @@
-package Controller;
+package com.smi.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,25 +11,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import Model.User;
-import Service.UserService;
+import com.smi.model.User;
+import com.smi.service.UserService;
 
 @RestController
 public class UserControler {
-	@Autowired
-    UserService userService;  //Service which will do all data retrieval/manipulation work
+	//@Autowired
+    //UserService userService;  //Service which will do all data retrieval/manipulation work
  
      
     //-------------------Retrieve All Users--------------------------------------------------------
      
-//    @RequestMapping(value = "/user/", method = RequestMethod.GET)
-//    public ResponseEntity<List<User>> listAllUsers() {
-//        List<User> users = userService.findAllUsers();
-//        if(users.isEmpty()){
-//            return new ResponseEntity<List<User>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
-//        }
-//        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-//    }
+    @RequestMapping(value = "/user/", method = RequestMethod.GET)
+    public ResponseEntity<String> listAllUsers() {
+        String helloWorld = "Hello world";
+        if(helloWorld.isEmpty()){
+            return new ResponseEntity<String>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+        }
+        return new ResponseEntity<String>(helloWorld, HttpStatus.OK);
+    }
  
  
     //-------------------Retrieve Single User--------------------------------------------------------
@@ -38,7 +37,7 @@ public class UserControler {
     @RequestMapping(value = "/user/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUser(@PathVariable("name") String name) {
         System.out.println("Fetching User with name " + name);
-        User user = userService.findByName(name);
+        User user = UserService.findByName(name);
         if (user == null) {
             System.out.println("User with name " + name + " not found");
             return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
@@ -54,12 +53,12 @@ public class UserControler {
     public ResponseEntity<Void> createUser(@RequestBody User user,    UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + user.getName());
  
-        if (userService.isUserExist(user)) {
+        if (UserService.isUserExist(user)) {
             System.out.println("A User with name " + user.getName() + " already exist");
             return new ResponseEntity<Void>(HttpStatus.CONFLICT);
         }
  
-        userService.saveUser(user);
+        UserService.saveUser(user);
  
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
@@ -73,7 +72,7 @@ public class UserControler {
     public ResponseEntity<User> updateUser(@PathVariable("name") String name, @RequestBody User user) {
         System.out.println("Updating User " + name);
          
-        User currentUser = userService.findByName(name);
+        User currentUser = UserService.findByName(name);
          
         if (currentUser==null) {
             System.out.println("User with name " + name + " not found");
@@ -84,7 +83,7 @@ public class UserControler {
 //        currentUser.setAge(user.getAge());
  //       currentUser.setSalary(user.getSalary());
          
-        userService.updateUser(currentUser);
+        UserService.updateUser(currentUser);
         return new ResponseEntity<User>(currentUser, HttpStatus.OK);
     }
  

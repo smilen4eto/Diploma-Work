@@ -1,4 +1,4 @@
-package Service;
+package com.smi.service;
 
 public class WordService {
 

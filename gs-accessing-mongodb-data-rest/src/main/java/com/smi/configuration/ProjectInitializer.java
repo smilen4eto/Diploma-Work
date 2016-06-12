@@ -1,4 +1,4 @@
-package Configuration;
+package com.smi.configuration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

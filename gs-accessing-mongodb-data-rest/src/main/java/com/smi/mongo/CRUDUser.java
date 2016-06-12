@@ -1,10 +1,9 @@
-package Mongo;
-
-import Model.User;
+package com.smi.mongo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.smi.model.User;
 
 
 public class CRUDUser {

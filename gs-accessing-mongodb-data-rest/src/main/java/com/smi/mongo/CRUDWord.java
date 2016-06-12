@@ -1,13 +1,12 @@
-package Mongo;
+package com.smi.mongo;
 
 import java.util.Iterator;
 import java.util.List;
 
-import Model.Language;
-import Model.Word;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.smi.model.Language;
+import com.smi.model.Word;
 
 public class CRUDWord {
 	public static void insertQueryWord(Word word){

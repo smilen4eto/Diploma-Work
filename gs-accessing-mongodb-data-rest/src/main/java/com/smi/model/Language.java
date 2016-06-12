@@ -1,4 +1,4 @@
-package Model;
+package com.smi.model;
 
 import java.util.List;
 

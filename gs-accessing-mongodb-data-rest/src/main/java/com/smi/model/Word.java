@@ -1,4 +1,4 @@
-package Model;
+package com.smi.model;
 
 import java.util.HashMap;
 import java.util.Map;
