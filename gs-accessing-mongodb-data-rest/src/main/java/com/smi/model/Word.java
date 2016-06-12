@@ -13,13 +13,14 @@ public class Word {
 	Language lang;
 	Map<String, Boolean> word;
 	
-	public Word(int level, int timesAnsCorr, int timesAnsWrong,
-			Language lang, String wordInMainLanguage) {
+	public Word() {
+		// TODO Auto-generated constructor stub
+	}
+	public Word(int level, int timesAnsCorr, int timesAnsWrong, String wordInEnglish) {
 		setLevel(level);
 		setTimesAnsCorr(0);
 		setTimesAnsWrong(0);
-		setWordInMainLanguage(wordInMainLanguage);
-		setLang(lang);
+		setWordInEnglish(wordInEnglish);
 		word = new HashMap<String, Boolean>();
 	}
 	

@@ -3,6 +3,7 @@ package com.smi.mongo;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
+
 public class Connector extends MongoClient {
 	 
 	 private static Connector mongoClient=null;
@@ -15,18 +16,16 @@ public class Connector extends MongoClient {
 	   
 	
 	   private Connector(String x,int y){
-		   super(x,y);
-		   counter++;
-		   
+		   super(x,y);		   
 	   }
 	   
 	   
 	   public static Connector getInstance(){
-		   
 		   if(mongoClient==null){
 		   synchronized (check) {
 			if (mongoClient==null) {
 				mongoClient = new Connector( "localhost" , 27017 );
+
 			}
 			   
 		}

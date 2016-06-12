@@ -47,28 +47,28 @@ public class UserControler {
  
      
      
-    //-------------------Create a User--------------------------------------------------------
+    //-------------------Create a User-------------------------------------------------------- ok
      
-    @RequestMapping(value = "/user/", method = RequestMethod.POST)
-    public ResponseEntity<Void> createUser(@RequestBody User user,    UriComponentsBuilder ucBuilder) {
-        System.out.println("Creating User " + user.getName());
+    @RequestMapping(value = "/user/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+        System.out.println("Creating User " + user.getUsername());
  
         if (UserService.isUserExist(user)) {
-            System.out.println("A User with name " + user.getName() + " already exist");
+            System.out.println("A User with name " + user.getUsername() + " already exist");
             return new ResponseEntity<Void>(HttpStatus.CONFLICT);
         }
  
         UserService.saveUser(user);
  
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
+        headers.setLocation(ucBuilder.path("/user/{username}").buildAndExpand(user.getUsername()).toUri());
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
  
      
     //------------------- Update a User --------------------------------------------------------
      
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user/{name}", method = RequestMethod.PUT)
     public ResponseEntity<User> updateUser(@PathVariable("name") String name, @RequestBody User user) {
         System.out.println("Updating User " + name);
          

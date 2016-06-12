@@ -12,7 +12,7 @@ public class CRUDWord {
 	public static void insertQueryWord(Word word){
 		BasicDBObject doc = new BasicDBObject()
 //				.append("language", word.getLang().getLanguageName())
-				.append("wordInMainLang", word.getWordInMainLanguage())
+				.append("wordInEn", word.getWordInEnglish())
 		        .append("level", word.getLevel())
 		        .append("timesAnsCorr", word.getTimesAnsCorr())
 		        .append("timesAnsWrong", word.getTimesAnsWrong());
@@ -30,9 +30,9 @@ public class CRUDWord {
 		word.getWord().remove(wordMeaning);
 		BasicDBObject wordDetail = new BasicDBObject();
 		wordDetail.put(word.getLang().getLanguageName(), wordMeaning);
-		wordDetail.put("word_wrong", word.getWord().keySet());
+		wordDetail.put("word_wrong"+word.getLang().getLanguageName() , word.getWord().keySet());
 			Connector.wordColl.update(new BasicDBObject("wordInEn", word.getWordInEnglish()),
-			new BasicDBObject("$set", new BasicDBObject("word_lang", wordDetail)));
+			new BasicDBObject("$set", new BasicDBObject("word_"+word.getLang().getLanguageName(), wordDetail)));
 	}
 	
 	public static DBObject getWordInLanguage(String language, String mainLanguage){

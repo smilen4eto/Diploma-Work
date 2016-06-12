@@ -19,20 +19,22 @@ public class User {
 	Map<Language, ArrayList<Integer>> answCorrWords;
 	Map<Language, ArrayList<Integer>> answWrongWords;
 	Boolean repeatWronWords;
-	float score;
-		
+	double score;
+	public User() {
+		// TODO Auto-generated constructor stub
+	}
 	public User(String name, String username, String email,
-			String password) {
+			String password, double score) {
 		setName(name);
 		setUsername(username);
 		setEmail(email);
 		setPassword(password);
 		setRepeatWronWords(false);
-		setScore(0);
-		answCorrWords = new HashMap<Language, ArrayList<Integer>>();
-		answWrongWords = new HashMap<Language, ArrayList<Integer>>();
-		answCorrWords.keySet().addAll(Language.availableLanguages);
-		answWrongWords.keySet().addAll(Language.availableLanguages);
+		setScore(score);
+//		answCorrWords = new HashMap<Language, ArrayList<Integer>>();
+//		answWrongWords = new HashMap<Language, ArrayList<Integer>>();
+//		answCorrWords.keySet().addAll(Language.availableLanguages);
+//		answWrongWords.keySet().addAll(Language.availableLanguages);
 	}
 	
 	
@@ -61,23 +63,13 @@ public class User {
 		this.email = email;
 	}
 	
-//    get
-//    {
-//        var bytes = Convert.FromBase64String(model.Password);
-//        return Encoding.UTF8.GetString(bytes);
-//    }
-//    set
-//    {
-//        var bytes = Encoding.UTF8.GetBytes(value);
-//        model.Password = Convert.ToBase64String(bytes);
-//    }
 	
 	public String getPassword() {
-		byte[] decoded = Base64.decode(this.password.getBytes());
+		byte[] decoded = Base64.decode(this.password.getBytes().toString());
 		return Arrays.toString(decoded);
 	}
 	public void setPassword(String password) {
-		byte[] encoded = Base64.encode(password.getBytes());
+		byte[] encoded = Base64.encode(password.getBytes().toString());
 		this.password = Arrays.toString(encoded);
 	}
 	public Language getMainLanguage() {
@@ -96,13 +88,21 @@ public class User {
 		return repeatWronWords;
 	}
 	public void setRepeatWronWords(Boolean repeatWronWords) {
-		this.repeatWronWords = repeatWronWords;
+		if (repeatWronWords == null){
+			this.repeatWronWords = false;
+		} else {
+			this.repeatWronWords = repeatWronWords;
+		}
 	}
-	public float getScore() {
+	public double getScore() {
 		return score;
 	}
-	public void setScore(float score) {
-		this.score = score;
+	public void setScore(double score) {
+		if (score < 0){
+			this.score = 0;
+		} else {
+			this.score = score;
+		}
 	}
 	
 	public void addCorrectWord(int wordId, Language lang){
@@ -121,11 +121,11 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", username=" + username
-				+ ", email=" + email + ", password=" + password
-				+ ", mainLanguage=" + mainLanguage + ", langToLearn="
-				+ langToLearn + ", answCorrWords=" + answCorrWords
-				+ ", answWrongWords=" + answWrongWords + ", repeatWronWords="
-				+ repeatWronWords + ", score=" + score + "]";
+				+ ", email=" + email + ", password=" + password;
+//				+ ", mainLanguage=" + mainLanguage + ", langToLearn="
+//				+ langToLearn + ", answCorrWords=" + answCorrWords
+//				+ ", answWrongWords=" + answWrongWords + ", repeatWronWords="
+//				+ repeatWronWords + ", score=" + score + "]";
 	}
 	
 	
