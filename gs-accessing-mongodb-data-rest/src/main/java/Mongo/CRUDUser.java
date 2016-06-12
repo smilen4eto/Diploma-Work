@@ -42,13 +42,13 @@ public class CRUDUser {
 	}
 	
 	//used for non-repeating user names
-	public static DBObject findActorByUsername(String username){
+	public static DBObject findUserByUsername(String username){
 		DBObject user = Connector.usersColl.findOne(new BasicDBObject("username", username));
 		return user;
 	}
 	
 	//used to verify correct user name and password
-	public static void findActorByUnameAndPassword(){
+	public static void findUserByUnameAndPassword(){
 		//maybe not necessary
 	}
 	
