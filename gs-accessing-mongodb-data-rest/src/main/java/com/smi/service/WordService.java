@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mongodb.DBObject;
 import com.smi.model.Language;
+import com.smi.model.User;
 import com.smi.model.Word;
+import com.smi.mongo.CRUDUser;
 import com.smi.mongo.CRUDWord;
 
 public class WordService {
@@ -22,43 +25,49 @@ public class WordService {
 //		word.setWord(wordInEs);
 //		word.setWordInEnglish("apple");
 //		CRUDWord.updateWordLanguageMeanings(word);
-		
-		Word word = new Word();
-		word.setLang(new Language("EN"));
-		word.setLevel(1);
-		Map<String, Boolean> wordInEn = new HashMap<String, Boolean>();
-		wordInEn.put("apple", true);
-		wordInEn.put("llablaka", false);
-		wordInEn.put("apriot", false);
-		wordInEn.put("fruit", false);
-		word.setWord(wordInEn);
-		word.setWordInEnglish("apple");
-		CRUDWord.updateWordLanguageMeanings(word);
 		return null;
 	}
+	
+	public static void addNewWordDefinition(Word word){
+		CRUDWord.updateWordLanguageMeanings(word);
+	}
 
-	public static Word findByLanguage(String language) {
-		// TODO Auto-generated method stub
-		return null;
+	public static DBObject findByLanguage(String language) {
+		DBObject foundWord = CRUDWord.findWordByEnglishDefinition(language);
+		return foundWord;
 	}
 
 	public static boolean isWordExist(Word word) {
-		// TODO Auto-generated method stub
-		return false;
+		DBObject foundWord = CRUDWord.findWordByEnglishDefinition(word.getWordInEnglish());
+		if (foundWord !=null){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static void saveWord(Word word) {
 		CRUDWord.insertQueryWord(word);
 		
 	}
-
-	public static void updateWord(Word currentWord) {
-		// TODO Auto-generated method stub
-		
+	
+	public static Word returnWordForGame(String wordInEnglish, String username){
+		DBObject user = CRUDUser.findUserByUsername(username);
+		DBObject word = CRUDWord.findWordByEnglishDefinition(wordInEnglish);
+		User foundUser = new User();
+		foundUser.setMainLanguage(new Language(user.get("mainLanguage").toString()));
+		foundUser.setLangToLearn(new Language(user.get("langToLearn").toString()));
+		Word neededWord = new Word();
+		neededWord.setWordInMainLanguage(word.get("word_"+foundUser.getMainLanguage()+"."+foundUser.getMainLanguage()).toString());
+		Map<String, Boolean> wordDefinition = new HashMap<String, Boolean>();
+		wordDefinition.put(word.get("word_"+foundUser.getLangToLearn()+"."+foundUser.getLangToLearn()).toString(), true);
+		//wordDefinition.putAll();
+		//neededWord.setWord(word.get("word_"+foundUser.getLangToLearn()));
+		return null;
 	}
 
 	public static void deleteWordByEn(String wordInEn) {
-		// TODO Auto-generated method stub
+		CRUDWord.deleteWord(wordInEn);
 		
 	}
 

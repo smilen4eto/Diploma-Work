@@ -1,17 +1,14 @@
 package com.smi.mongo;
 
-import java.util.Iterator;
-import java.util.List;
+
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.smi.model.Language;
 import com.smi.model.Word;
 
 public class CRUDWord {
 	public static void insertQueryWord(Word word){
 		BasicDBObject doc = new BasicDBObject()
-//				.append("language", word.getLang().getLanguageName())
 				.append("wordInEn", word.getWordInEnglish())
 		        .append("level", word.getLevel())
 		        .append("timesAnsCorr", word.getTimesAnsCorr())
@@ -35,9 +32,17 @@ public class CRUDWord {
 			new BasicDBObject("$set", new BasicDBObject("word_"+word.getLang().getLanguageName(), wordDetail)));
 	}
 	
-	public static DBObject getWordInLanguage(String language, String mainLanguage){
-		return null;
-//		DBObject word = Connector.usersColl.findOne(new BasicDBObject("username", username));
-		
+//	public static DBObject getWordInLanguage(String wordInEnglish,String languageToLearn, String mainLanguage){
+//		DBObject word = Connector.wordColl.findOne(new BasicDBObject("wordInEn", wordInEnglish));
+//		
+//	}
+
+	public static DBObject findWordByEnglishDefinition(String wordInEnglish) {
+		DBObject word = Connector.wordColl.findOne(new BasicDBObject("wordInEn", wordInEnglish));
+		return word;
+	}
+
+	public static void deleteWord(String wordInEn) {
+		Connector.wordColl.remove(new BasicDBObject("wordInEn", wordInEn));
 	}
 }

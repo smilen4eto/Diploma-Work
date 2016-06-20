@@ -24,17 +24,26 @@ public class User {
 		// TODO Auto-generated constructor stub
 	}
 	public User(String name, String username, String email,
-			String password, double score) {
+			String password) {
 		setName(name);
 		setUsername(username);
 		setEmail(email);
 		setPassword(password);
+//		setPassword(password);
 		setRepeatWronWords(false);
-		setScore(score);
+//		setScore(score);
 //		answCorrWords = new HashMap<Language, ArrayList<Integer>>();
 //		answWrongWords = new HashMap<Language, ArrayList<Integer>>();
 //		answCorrWords.keySet().addAll(Language.availableLanguages);
 //		answWrongWords.keySet().addAll(Language.availableLanguages);
+	}
+	
+	public User(String name, String username, String email, double score, boolean repeatWords){
+		setName(name);
+		setUsername(username);
+		setEmail(email);
+		setScore(score);
+		setRepeatWronWords(false);
 	}
 	
 	
@@ -65,12 +74,15 @@ public class User {
 	
 	
 	public String getPassword() {
-		byte[] decoded = Base64.decode(this.password.getBytes().toString());
-		return Arrays.toString(decoded);
+//		byte[] decoded = Base64.decode(this.password.getBytes().toString());
+		System.out.println("decoded" + this.password);
+		return this.password;
+		
 	}
 	public void setPassword(String password) {
-		byte[] encoded = Base64.encode(password.getBytes().toString());
+		byte[] encoded = Base64.encode(password);
 		this.password = Arrays.toString(encoded);
+		System.out.println("encoded"+ this.password );
 	}
 	public Language getMainLanguage() {
 		return mainLanguage;

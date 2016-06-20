@@ -24,6 +24,12 @@ public class Word {
 		word = new HashMap<String, Boolean>();
 	}
 	
+	public Word(int level, Map<String, Boolean> wordInLang, String wordInEnglish){
+		this.setLevel(level);
+		this.setWord(wordInLang);
+		this.setWordInEnglish(wordInEnglish);
+	}
+	
 	public int getId() {
 		return id;
 	}

@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.mongodb.DBObject;
+import com.smi.model.Language;
+import com.smi.model.User;
 import com.smi.model.Word;
 import com.smi.service.WordService;
 
@@ -20,30 +23,32 @@ import com.smi.service.WordService;
 public class WordController {
 	//-------------------Retrieve All Words--------------------------------------------------------
     
-	@RequestMapping(value = "/word/", method = RequestMethod.GET)
-	public ResponseEntity<List<Word>> listAllWords() {
-		List<Word> words = WordService.findAllUsers();
-//		if(words.isEmpty()){
-//			return new ResponseEntity<List<Word>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
-//		}
-		return new ResponseEntity<List<Word>>(words, HttpStatus.OK);
-	}
- 
+//	@RequestMapping(value = "/word/", method = RequestMethod.GET)
+//	public ResponseEntity<List<Word>> listAllWords() {
+//		List<Word> words = WordService.findAllUsers();
+////		if(words.isEmpty()){
+////			return new ResponseEntity<List<Word>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+////		}
+//		return new ResponseEntity<List<Word>>(words, HttpStatus.OK);
+//	}
+// 
  
     //-------------------Retrieve Single Word--------------------------------------------------------
+	
+	//TBD!!!!!!!!
      
-    @RequestMapping(value = "/word/{language}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Word> getWord(@PathVariable("language") String language) {
-        System.out.println("Fetching Word in language " + language);
-        Word word = WordService.findByLanguage(language);
+    @RequestMapping(value = "/word/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Word> getWord(@PathVariable("username") String username) {
+        System.out.println("Fetching Word for user " + username);
+        Word word = WordService.returnWordForGame("", username);
         if (word == null) {
-            System.out.println("Word in this language" + language + "does not exist");
+            System.out.println("Word " + "" + "does not exist");
             return new ResponseEntity<Word>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Word>(word, HttpStatus.OK);
     }
  
-     
+
      
     //-------------------Create a Word-------------------------------------------------------- ok
      
@@ -66,23 +71,21 @@ public class WordController {
      
     //------------------- Update a Word --------------------------------------------------------
      
-    @RequestMapping(value = "/word/{wordInEnglish}", method = RequestMethod.PUT)
-    public ResponseEntity<Word> updateWord(@PathVariable("wordInEnglish") String wordInEn, @RequestBody Word word) {
-        System.out.println("Updating Word " + word);
+    @RequestMapping(value = "/word/{language}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Word> updateWord(@PathVariable("language") String language, @RequestBody Word word) {
+        System.out.println("Updating Word " + word.getWordInEnglish());
          
-        Word currentWord = WordService.findByLanguage(word.getLang().toString());
+        DBObject currentWord = WordService.findByLanguage(word.getWordInEnglish());
          
         if (currentWord==null) {
-            System.out.println("Word with name " + wordInEn + " not found");
+            System.out.println("Word with name " + currentWord + " not found");
             return new ResponseEntity<Word>(HttpStatus.NOT_FOUND);
         }
- // -------Changes to be done
- //       currentWord.set(.getName());
-//        currentUser.setAge(user.getAge());
- //       currentUser.setSalary(user.getSalary());
+        
+        word.setLang(new Language(language));
          
-        WordService.updateWord(currentWord);
-        return new ResponseEntity<Word>(currentWord, HttpStatus.OK);
+        WordService.addNewWordDefinition(word);
+        return new ResponseEntity<Word>(word, HttpStatus.OK);
     }
  
     //------------------- Delete a User --------------------------------------------------------
@@ -91,7 +94,7 @@ public class WordController {
     public ResponseEntity<Word> deleteWord(@PathVariable("wordInEn") String wordInEn) {
         System.out.println("Fetching & Deleting word " + wordInEn);
  
-        Word word = WordService.findByLanguage(wordInEn);
+        DBObject word = WordService.findByLanguage(wordInEn);
         if (word == null) {
             System.out.println("Unable to delete. Word not found");
             return new ResponseEntity<Word>(HttpStatus.NOT_FOUND);
@@ -102,15 +105,6 @@ public class WordController {
     }
  
      
-//    //------------------- Delete All Users --------------------------------------------------------
-//     
-//    @RequestMapping(value = "/user/", method = RequestMethod.DELETE)
-//    public ResponseEntity<User> deleteAllUsers() {
-//        System.out.println("Deleting All Users");
-// 
-//        userService.deleteAllUsers();
-//        return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
-//    }
  
 
 }

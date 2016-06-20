@@ -49,44 +49,85 @@ public class UserControler {
      
     //-------------------Create a User-------------------------------------------------------- ok
      
-    @RequestMapping(value = "/user/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+    @RequestMapping(value = "/user/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + user.getUsername());
  
         if (UserService.isUserExist(user)) {
             System.out.println("A User with name " + user.getUsername() + " already exist");
-            return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+            return new ResponseEntity<User>(HttpStatus.CONFLICT);
         }
- 
+
         UserService.saveUser(user);
  
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{username}").buildAndExpand(user.getUsername()).toUri());
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setLocation(ucBuilder.path("/user/{username}").buildAndExpand(user.getUsername()).toUri());
+        return new ResponseEntity<User>(user ,HttpStatus.CREATED);
     }
  
+    //-------------------Check User pass-------------------------------------------------------- ok
+    
+    @RequestMapping(value = "/user/signin", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> checkPassword(@RequestBody User user, UriComponentsBuilder ucBuilder) {
+        System.out.println("Checking user " + user.getEmail());
+        User foundUser = UserService.findByEmail(user.getEmail());
+        if (foundUser == null) {
+            System.out.println("A User with mail " + user.getEmail() + " does not exist");
+            return new ResponseEntity<User>(HttpStatus.CONFLICT);
+        }
+ 
+        User result = UserService.checkPassword(user);
+        if (result != null){
+        	result.setPassword("********");
+        	return new ResponseEntity<User>(result, HttpStatus.OK);
+        } else {
+        	
+        	return new ResponseEntity<User>(result, HttpStatus.NO_CONTENT);
+        }
+        
+    }
      
     //------------------- Update a User --------------------------------------------------------
      
-    @RequestMapping(value = "/user/{name}", method = RequestMethod.PUT)
-    public ResponseEntity<User> updateUser(@PathVariable("name") String name, @RequestBody User user) {
-        System.out.println("Updating User " + name);
+    @RequestMapping(value = "/user/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<User> updateUser(@PathVariable("username") String username, @RequestBody User user) {
+        System.out.println("Updating User " + username);
          
-        User currentUser = UserService.findByName(name);
+        User currentUser = UserService.findByName(username);
          
         if (currentUser==null) {
-            System.out.println("User with name " + name + " not found");
+            System.out.println("User with name " + username + " not found");
             return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
         }
  
-        currentUser.setName(user.getName());
-//        currentUser.setAge(user.getAge());
- //       currentUser.setSalary(user.getSalary());
+//        currentUser(user.getName());
+
          
         UserService.updateUser(currentUser);
         return new ResponseEntity<User>(currentUser, HttpStatus.OK);
     }
  
+    //------------------- Update a User Score--------------------------------------------------------
+    
+    @RequestMapping(value = "/user/", method = RequestMethod.PUT)
+    public ResponseEntity<User> updateUserScore(@RequestBody User user) {
+        System.out.println("Updating User " + user.getUsername());
+         
+        User currentUser = UserService.findByName(user.getUsername());
+         
+        if (currentUser==null) {
+            System.out.println("User with name " + user.getUsername() + " not found");
+            return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        }
+ 
+        currentUser.setScore(user.getScore());
+
+         
+        UserService.updateUserScore(currentUser);
+        return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+    }
+    
+    
 //    //------------------- Delete a User --------------------------------------------------------
 //     
 //    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)

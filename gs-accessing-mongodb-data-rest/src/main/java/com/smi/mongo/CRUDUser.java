@@ -18,7 +18,7 @@ public class CRUDUser {
 		Connector.usersColl.insert(doc);
 	}
 	
-	public static void updateUserScore(String username, float score){
+	public static void updateUserScore(String username, double score){
 		Connector.usersColl.update(new BasicDBObject("name", username),
 		        new BasicDBObject("$set", new BasicDBObject("score", score)));
 	}
@@ -60,6 +60,12 @@ public class CRUDUser {
 	}
 	
 	public static void removeWrongOrCorrectWord(){
+		
+	}
+
+	public static DBObject findUserByEmail(String email) {
+		DBObject user = Connector.usersColl.findOne(new BasicDBObject("mail", email));
+		return user;
 		
 	}
 }
