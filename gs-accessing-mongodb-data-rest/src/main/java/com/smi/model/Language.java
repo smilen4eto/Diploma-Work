@@ -8,6 +8,9 @@ public class Language {
 	String languageName;
 	static List<Language> availableLanguages;
 	
+	public Language() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public Language(String languageName) {
 		setLanguageName(languageName);

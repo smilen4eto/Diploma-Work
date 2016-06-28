@@ -14,7 +14,10 @@ public class CRUDUser {
 		        .append("mail", user.getEmail())
 		        .append("password", user.getPassword())
 		        .append("score", user.getScore())
-		        .append("repeatWrWords", user.getRepeatWronWords());
+		        .append("repeatWrWords", user.getRepeatWronWords())
+		        .append("mainLanguage", user.getMainLanguage())
+		        .append("langToLearn", user.getLangToLearn());
+				
 		Connector.usersColl.insert(doc);
 	}
 	
@@ -29,14 +32,14 @@ public class CRUDUser {
 	}
 		
 	public static void addMainLanguageAndLanguageToLearn(String username, String mainLanguage, String langToLearn){
-		Connector.usersColl.update(new BasicDBObject("name", username),
+		Connector.usersColl.update(new BasicDBObject("username", username),
 		new BasicDBObject("$set", new BasicDBObject()
 		.append("mainLanguage", mainLanguage)
 		.append("langToLearn",langToLearn)));
 	}
 	
 	public static void updateLanguage(String username, String languageType, String language){
-		Connector.usersColl.update(new BasicDBObject("name", username),
+		Connector.usersColl.update(new BasicDBObject("username", username),
 		        new BasicDBObject("$set", new BasicDBObject(languageType, language)));
 	}
 	

@@ -19,7 +19,8 @@ public class UserService {
 		DBObject user = CRUDUser.findUserByUsername(username);
 		if (user !=null){
 		User foundUser = new User( user.get("name").toString(), username,
-				user.get("mail").toString(), user.get("password").toString());
+				user.get("mail").toString(), user.get("password").toString(), user.get("mainLanguage").toString(), user.get("langToLearn").toString());
+		foundUser.setRepeatWronWords((Boolean)user.get("repeatWrWords"));
 		return foundUser;
 		} else {
 			return null;
@@ -38,8 +39,9 @@ public class UserService {
 	}
 	public static void updateUser(User currentUser) {
 		CRUDUser.updateUserRepeatWords(currentUser.getUsername(), currentUser.getRepeatWronWords());
-		CRUDUser.updateLanguage(currentUser.getUsername(), "mainLang" ,currentUser.getMainLanguage().getLanguageName());
-		CRUDUser.updateLanguage(currentUser.getUsername(), "langToLearn", currentUser.getLangToLearn().getLanguageName());
+		//addMainLanguageAndLanguageToLearn
+		CRUDUser.addMainLanguageAndLanguageToLearn(currentUser.getUsername(),currentUser.getMainLanguage(), currentUser.getLangToLearn());
+		//CRUDUser.updateLanguage(currentUser.getUsername(), "langToLearn", currentUser.getLangToLearn().toString());
 		
 	}
 	

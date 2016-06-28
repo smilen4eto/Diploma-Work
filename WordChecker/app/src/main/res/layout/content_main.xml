@@ -70,5 +70,12 @@
         android:id="@+id/btnSave"
         android:clickable="true" />
 
+    <TextView
+        android:layout_width="228dp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:id="@+id/textViewPreferences"
+        android:layout_marginTop="55dp" />
+
 
 </LinearLayout>

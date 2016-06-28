@@ -99,11 +99,12 @@ public class UserControler {
             System.out.println("User with name " + username + " not found");
             return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
         }
- 
+        user.setUsername(username);
 //        currentUser(user.getName());
 
          
-        UserService.updateUser(currentUser);
+        UserService.updateUser(user);
+        currentUser = UserService.findByName(username);
         return new ResponseEntity<User>(currentUser, HttpStatus.OK);
     }
  

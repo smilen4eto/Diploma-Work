@@ -15,11 +15,11 @@
     </string>
     <string name="title_activity_main">Welcome</string>
     <string-array name="langs_array">
-        <item id="EN">English</item>
-        <item id="ES">Español</item>
-        <item id="RU">Руский</item>
-        <item id="BG">Български</item>
-        <item id="TR">Türkçe</item>
+        <item id="EN">EN</item>
+        <item id="ES">ES</item>
+        <item id="RU">RU</item>
+        <item id="BG">BG</item>
+        <item id="TR">TR</item>
     </string-array>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>

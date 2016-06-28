@@ -55,8 +55,8 @@ public class WordService {
 		DBObject user = CRUDUser.findUserByUsername(username);
 		DBObject word = CRUDWord.findWordByEnglishDefinition(wordInEnglish);
 		User foundUser = new User();
-		foundUser.setMainLanguage(new Language(user.get("mainLanguage").toString()));
-		foundUser.setLangToLearn(new Language(user.get("langToLearn").toString()));
+		foundUser.setMainLanguage(user.get("mainLanguage").toString());
+		foundUser.setLangToLearn(user.get("langToLearn").toString());
 		Word neededWord = new Word();
 		neededWord.setWordInMainLanguage(word.get("word_"+foundUser.getMainLanguage()+"."+foundUser.getMainLanguage()).toString());
 		Map<String, Boolean> wordDefinition = new HashMap<String, Boolean>();

@@ -86,6 +86,8 @@ public class RegisterActivity extends AppCompatActivity  {
                 jsonParam.put("password", mPassword);
                 jsonParam.put("score", 0);
                 jsonParam.put("repeatWronWords", false);
+                jsonParam.put("mainLanguage", "EN");
+                jsonParam.put("langToLearn", "EN");
             } catch (Exception e){
                 Log.e("JSON creation exception", e.getMessage());
             }

@@ -1,9 +1,11 @@
 package com.smilena.wordchecker;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -19,22 +21,26 @@ import com.github.clans.fab.FloatingActionMenu;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 import sessionManager.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
-    String name = null;
+    String name;
     Double score = 0d;
-    String username = "";
     public String mainLanguage;
     public String langToLearn;
+    public String username = "";
     // Session Manager Class
     SessionManager session;
+    private UserSelectionTask mAuthTask = null;
 
     // Button Logout
     Button btnLogout;
+    //public TextView textPreferences = (TextView) findViewById(R.id.textViewPreferences);
 
     FloatingActionMenu materialDesignFAM;
-    com.github.clans.fab.FloatingActionButton floatingActionButton1, floatingActionButton2, floatingActionButton3;
+    com.github.clans.fab.FloatingActionButton floatingActionButton1, floatingActionButton2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -42,12 +48,13 @@ public class MainActivity extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
         session.checkLogin();
+        username = session.getUserDetails().get("name");
         String value = intent.getStringExtra("name");
         try {
             JSONObject jobj = new JSONObject(value);
             name = jobj.get("name").toString();
             score = jobj.getDouble("score");
-            username = jobj.getString("username");
+            //username = jobj.getString("username");
         } catch (Exception e){
             Log.e("Exception", e.toString());
         }
@@ -127,24 +134,17 @@ public class MainActivity extends AppCompatActivity {
         saveSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("repeatWronWords", true);
-                    jsonObject.put("mainLanguage", mainLanguage);
-                    jsonObject.put("langToLearn", langToLearn);
-                    String result = RESTConnector.connectToHTTPut(UrlKeeper.putUpdate + username,jsonObject);
-                    if (result != null){
-                        //Toast.makeText(View.getContext(), "Lang selected"+parent.getItemAtPosition(position), Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                startGame();
             }
         });
     }
-
     public void startGame(){
-
+        if (mAuthTask != null) {
+            return;
+        } else {
+            mAuthTask = new UserSelectionTask(langToLearn, mainLanguage);
+            mAuthTask.execute((Void) null);
+        }
     }
 
 
@@ -154,5 +154,88 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.settings, menu);
         return true;
     }
+
+
+    public class UserSelectionTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String mLangToLearn;
+        private final String mMainLanguage;
+
+        UserSelectionTask(String langToLearn, String mainLang) {
+            mLangToLearn = langToLearn;
+            mMainLanguage = mainLang;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String url = UrlKeeper.putUpdate+"/"+username;
+            JSONObject jsonParam = new JSONObject();
+            try {
+                jsonParam.put("repeatWronWords", true);
+                jsonParam.put("mainLanguage", mMainLanguage);
+                jsonParam.put("langToLearn", mLangToLearn);
+            } catch (Exception e) {
+                Log.e("JSON creation exception", e.getMessage());
+            }
+            String result = RESTConnector.connectToHTTPut(url, jsonParam);
+            if (result != null) {
+                  //Toast.makeText(getApplicationContext(), "Preferences saved", Toast.LENGTH_SHORT).show();
+                    return true;
+
+//                try {
+//                    //JSONObject jobj = new JSONObject(result);
+//                    Toast.makeText(getApplicationContext(), jobj.get("mainLanguage").toString(), Toast.LENGTH_SHORT).show();
+//                    //session.createLoginSession(jobj.get("username").toString(), mEmail);
+//                    // Staring MainActivity
+//                    //Intent i = new Intent(getApplicationContext(), MainActivity.class);
+//                    //i.putExtra("name", result.toString());
+//                    //startActivity(i);
+//                    //finish();
+//
+//                    return true;
+//
+//                } catch (Exception e) {
+//                    Log.e("Json parsing exception", e.getMessage());
+//                    return false;
+//
+//                }
+
+
+            } else {
+//                Intent myIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+//                myIntent.putExtra("email", mEmail); //Optional parameters
+//                LoginActivity.this.startActivity(myIntent);
+//                // TODO: register the new account here.
+//                return true;
+                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            //showProgress(false);
+
+            if (success) {
+                if (((TextView) findViewById(R.id.textViewPreferences)) != null) {
+                    ((TextView) findViewById(R.id.textViewPreferences)).setText("Click the Start button");
+                }
+                //finish();
+            } else {
+                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+                //mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            //showProgress(false);
+        }
+    }
+
 
 }

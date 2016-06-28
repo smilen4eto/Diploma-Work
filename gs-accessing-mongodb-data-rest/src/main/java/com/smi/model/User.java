@@ -14,8 +14,8 @@ public class User {
 	String username;
 	String email;
 	String password;
-	Language mainLanguage;
-	Language langToLearn;
+	String mainLanguage;
+	String langToLearn;
 	Map<Language, ArrayList<Integer>> answCorrWords;
 	Map<Language, ArrayList<Integer>> answWrongWords;
 	Boolean repeatWronWords;
@@ -47,6 +47,14 @@ public class User {
 	}
 	
 	
+	public User(String name, String username, String email, String password, String mainLanguage, String languageToLearn) {
+		setName(name);
+		setUsername(username);
+		setEmail(email);
+		setPassword(password);
+		setMainLanguage(mainLanguage);
+		setLangToLearn(languageToLearn);
+	}
 	public int getId() {
 		return id;
 	}
@@ -84,16 +92,16 @@ public class User {
 		this.password = Arrays.toString(encoded);
 		System.out.println("encoded"+ this.password );
 	}
-	public Language getMainLanguage() {
+	public String getMainLanguage() {
 		return mainLanguage;
 	}
-	public void setMainLanguage(Language mainLanguage) {
+	public void setMainLanguage(String mainLanguage) {
 		this.mainLanguage = mainLanguage;
 	}
-	public Language getLangToLearn() {
+	public String getLangToLearn() {
 		return langToLearn;
 	}
-	public void setLangToLearn(Language langToLearn) {
+	public void setLangToLearn(String langToLearn) {
 		this.langToLearn = langToLearn;
 	}
 	public Boolean getRepeatWronWords() {
