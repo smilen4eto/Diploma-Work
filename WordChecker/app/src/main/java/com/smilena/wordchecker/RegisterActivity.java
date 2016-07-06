@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -25,9 +26,12 @@ import java.net.URL;
 import java.security.spec.ECField;
 import java.util.Arrays;
 
-public class RegisterActivity extends AppCompatActivity  {
-    private EditText mEmailView, mPasswordView, mNameView, mUsernameView;
+import sessionManager.SessionManager;
+
+public class RegisterActivity extends AppCompatActivity {
+    public EditText mEmailView, mPasswordView, mNameView, mUsernameView, mRepeatPasswordView;
     private UserRegisterTask mAuthTask = null;
+    SessionManager session;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,31 +40,112 @@ public class RegisterActivity extends AppCompatActivity  {
         String value = intent.getStringExtra("email");
         mEmailView = (EditText) findViewById(R.id.editTextEmail);
         mEmailView.setText(value);
-        final Button registerBtn = (Button) findViewById(R.id.btnRegister);
-            registerBtn.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    sendInformationForRegister();
-                }
-            });
-    }
-
-    public void sendInformationForRegister() {
-        if (mAuthTask != null) {
-            return;
-        }
         mNameView = ((EditText) findViewById(R.id.editText));
         mUsernameView = ((EditText) findViewById(R.id.editTextUsername));
         mPasswordView = ((EditText) findViewById(R.id.editTextPassword));
+        mRepeatPasswordView = ((EditText)findViewById(R.id.editTextRepeatPassword));
+        final Button registerBtn = (Button) findViewById(R.id.btnRegister);
+        registerBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                sendInformationForRegister();
+            }
+        });
+        session = new SessionManager(getApplicationContext());
+    }
+
+
+    private void sendInformationForRegister() {
+        if (mAuthTask != null) {
+            return;
+        }
+
+        // Reset errors.
+        mNameView.setError(null);
+        mPasswordView.setError(null);
+        mRepeatPasswordView.setError(null);
+        mEmailView.setError(null);
+        mUsernameView.setError(null);
+        // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String name = mNameView.getText().toString();
         String username = mUsernameView.getText().toString();
-        mAuthTask = new RegisterActivity.UserRegisterTask(email, password, name, username);
-        mAuthTask.execute((Void) null);
+        String repeatPassword = mRepeatPasswordView.getText().toString();
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            mPasswordView.setError("Паролата е твърде кратка");
+            focusView = mPasswordView;
+            cancel = true;
         }
-// --------------- To be implemented
+
+        if (!doPasswordsMatch(password, repeatPassword)) {
+            mRepeatPasswordView.setError("Паролите не съвпадат");
+            focusView = mRepeatPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(name)) {
+            mNameView.setError("Полето е задължително");
+            focusView = mNameView;
+            cancel = true;
+        } else if (!isNameValid(name)) {
+            mNameView.setError("Името трябва да е повече от 3 символа");
+            focusView = mNameView;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError("Полето е задължително");
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError("Невалидна поща");
+            focusView = mEmailView;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(username)) {
+            mUsernameView.setError("Полето е задължително");
+            focusView = mUsernameView;
+            cancel = true;
+        }
+
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            mAuthTask = new RegisterActivity.UserRegisterTask(email, password, name, username);
+            mAuthTask.execute((Void) null);
+            ;
+        }
+    }
+
+    private boolean isNameValid(String name) {
+        return name.length() > 3;
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
+    }
+
+    private boolean doPasswordsMatch(String password, String repeatPassword) {
+        return password.contentEquals(repeatPassword);
+    }
+
+    private boolean isEmailValid(String email) {
+        return email.contains("@");
+    }
+
     public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
@@ -94,9 +179,12 @@ public class RegisterActivity extends AppCompatActivity  {
             String url = UrlKeeper.postRegister;
             String result = RESTConnector.connectToHTTPost(url, jsonParam);
             if(result != null){
+                session.createLoginSession(mUsername, mEmail);
                 Intent myIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                myIntent.putExtra("name", result.toString()); //Optional parameters
-                RegisterActivity.this.startActivity(myIntent);
+                myIntent.putExtra("name", mUsername); //Optional parameters
+                //RegisterActivity.this.startActivity(myIntent);
+                startActivity(myIntent);
+                finish();
                 return true;
             }
             return false;

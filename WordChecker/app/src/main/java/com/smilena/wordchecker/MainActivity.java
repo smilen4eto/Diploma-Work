@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,19 +27,16 @@ import java.util.Arrays;
 import sessionManager.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
-    String name;
-    Double score = 0d;
+    public Double score;
     public String mainLanguage;
     public String langToLearn;
-    public String username = "";
+    public String username;
+    public String name;
     // Session Manager Class
     SessionManager session;
     private UserSelectionTask mAuthTask = null;
-
-    // Button Logout
-    Button btnLogout;
-    //public TextView textPreferences = (TextView) findViewById(R.id.textViewPreferences);
-
+    private UserInformationTask mInfoTask = null;
+    String json;
     FloatingActionMenu materialDesignFAM;
     com.github.clans.fab.FloatingActionButton floatingActionButton1, floatingActionButton2;
     @Override
@@ -46,22 +44,27 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         // Session class instance
         session = new SessionManager(getApplicationContext());
-        Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
         session.checkLogin();
         username = session.getUserDetails().get("name");
-        String value = intent.getStringExtra("name");
-        try {
-            JSONObject jobj = new JSONObject(value);
-            name = jobj.get("name").toString();
-            score = jobj.getDouble("score");
-            //username = jobj.getString("username");
-        } catch (Exception e){
-            Log.e("Exception", e.toString());
+        String name = intent.getStringExtra("name");
+        if (mInfoTask != null) {
+            return;
+        } else {
+            mInfoTask = new UserInformationTask(username);
+            mInfoTask.execute((Void) null);
         }
-        super.onCreate(savedInstanceState);
+//        try {
+//            JSONObject jobj = new JSONObject(value);
+//            name = jobj.get("name").toString();
+//            score = jobj.getDouble("score");
+//            //username = jobj.getString("username");
+//        } catch (Exception e){
+//            Log.e("Exception", e.toString());
+//        }
+        super.onCreate(Bundle.EMPTY);
         setContentView(R.layout.activity_main);
-        TextView welcome = (TextView) findViewById(R.id.textView);
-        welcome.setText("Welcome, " + name + "!!!");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,65 +72,49 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton1 = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.material_design_floating_action_menu_item1);
         floatingActionButton2 = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.material_design_floating_action_menu_item2);
 
-        floatingActionButton1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //Start the game /
-                Intent myIntent = new Intent(MainActivity.this, FullscreenActivity.class);
-                //myIntent.putExtra("email", mEmail); //Optional parameters
-                MainActivity.this.startActivity(myIntent);
 
-            }
-        });
         floatingActionButton2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //TODO make statistics view
-
+                Intent i = new Intent(getApplicationContext(), StatisticActivity.class);
+                startActivity(i);
 
             }
         });
 
         Spinner spinnerMainLang = (Spinner) findViewById(R.id.spinnerMainLang);
-        // Create an ArrayAdapter using the string array and a default spinner layout
+        Spinner spinnerLangToLearn = (Spinner) findViewById(R.id.spinnerLangToLearn);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.langs_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinnerMainLang.setAdapter(adapter);
-        Spinner spinnerLangToLearn = (Spinner) findViewById(R.id.spinnerLangToLearn);
+
         spinnerLangToLearn.setAdapter(adapter);
 
         spinnerLangToLearn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //parent.getItemAtPosition(position);
-                //Toast.makeText(parent.getContext(), "Lang selected"+parent.getItemAtPosition(position), Toast.LENGTH_LONG).show();
-                //langToLearn = parent.getItemAtPosition(position);
                 langToLearn = parent.getItemAtPosition(position).toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(parent.getContext(), "Please select language", Toast.LENGTH_LONG).show();
+                Toast.makeText(parent.getContext(), "Моля изберете език", Toast.LENGTH_LONG).show();
 
             }
         });
         spinnerMainLang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //parent.getItemAtPosition(position);
-                //Toast.makeText(parent.getContext(), "Lang selected"+parent.getItemAtPosition(position), Toast.LENGTH_LONG).show();
                 mainLanguage = parent.getItemAtPosition(position).toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(parent.getContext(), "Please select language", Toast.LENGTH_LONG).show();
+                Toast.makeText(parent.getContext(), "Моля изберете език", Toast.LENGTH_LONG).show();
             }
         });
 
-        TextView textViewScore = (TextView)findViewById(R.id.textViewScore);
-        textViewScore.setText("Your score is " + score);
+
 
 
         Button saveSettings = (Button) findViewById(R.id.btnSave);
@@ -137,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                 startGame();
             }
         });
+
+
     }
     public void startGame(){
         if (mAuthTask != null) {
@@ -148,12 +137,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings, menu);
+        menu.getItem(1).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                session = null;
+                finish();
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(i);
+                return true;
+            }
+        });
+        menu.getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+                i.putExtra("username", username);
+                i.putExtra("name", name);
+                startActivity(i);
+                return true;
+            }
+        });
         return true;
     }
+
 
 
     public class UserSelectionTask extends AsyncTask<Void, Void, Boolean> {
@@ -168,6 +175,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            if (mMainLanguage.equals(mLangToLearn)){
+                return false;
+            }
             String url = UrlKeeper.putUpdate+"/"+username;
             JSONObject jsonParam = new JSONObject();
             try {
@@ -179,34 +189,10 @@ public class MainActivity extends AppCompatActivity {
             }
             String result = RESTConnector.connectToHTTPut(url, jsonParam);
             if (result != null) {
-                  //Toast.makeText(getApplicationContext(), "Preferences saved", Toast.LENGTH_SHORT).show();
+                json = result;
                     return true;
 
-//                try {
-//                    //JSONObject jobj = new JSONObject(result);
-//                    Toast.makeText(getApplicationContext(), jobj.get("mainLanguage").toString(), Toast.LENGTH_SHORT).show();
-//                    //session.createLoginSession(jobj.get("username").toString(), mEmail);
-//                    // Staring MainActivity
-//                    //Intent i = new Intent(getApplicationContext(), MainActivity.class);
-//                    //i.putExtra("name", result.toString());
-//                    //startActivity(i);
-//                    //finish();
-//
-//                    return true;
-//
-//                } catch (Exception e) {
-//                    Log.e("Json parsing exception", e.getMessage());
-//                    return false;
-//
-//                }
-
-
             } else {
-//                Intent myIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-//                myIntent.putExtra("email", mEmail); //Optional parameters
-//                LoginActivity.this.startActivity(myIntent);
-//                // TODO: register the new account here.
-//                return true;
                 Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -216,26 +202,103 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            //showProgress(false);
 
             if (success) {
                 if (((TextView) findViewById(R.id.textViewPreferences)) != null) {
-                    ((TextView) findViewById(R.id.textViewPreferences)).setText("Click the Start button");
+                    ((TextView) findViewById(R.id.textViewPreferences)).setText("Натисни Старт бутона");
+                    floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            //Start the game /
+                            Intent myIntent = new Intent(MainActivity.this, FullscreenActivity.class);
+                            myIntent.putExtra("json", json); //Optional parameters
+                            MainActivity.this.startActivity(myIntent);
+
+                        }
+                    });
                 }
-                //finish();
+
             } else {
-                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
-                //mPasswordView.setError(getString(R.string.error_incorrect_password));
-                //mPasswordView.requestFocus();
+                ((TextView) findViewById(R.id.textViewPreferences)).setText("Избери различни езици");
+                floatingActionButton1.setOnClickListener(null);
             }
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            //showProgress(false);
         }
     }
 
+    public class UserInformationTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String mUsername;
+        public double points;
+        public String mName;
+        public String mMainLanguage;
+        public String mLangToLearn;
+
+        UserInformationTask(String username) {
+            mUsername = username;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String value = RESTConnector.connectToHTTGet(String.format("%s%s", UrlKeeper.getUserInfo, username));
+            try {
+                JSONObject jobj = new JSONObject(value);
+                //username = jobj.get("username").toString();
+                Log.e("usernameeeeee",username);
+                name = jobj.getString("name");
+                mName = name;
+                points = (double)jobj.get("score");
+                Log.e("scoreeee",""+jobj.get("score"));
+                mMainLanguage = jobj.get("mainLanguage").toString();
+                mLangToLearn = jobj.get("langToLearn").toString();
+                return true;
+            } catch (Exception e){
+                Log.e("Exception in get user", e.toString());
+                return false;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mInfoTask = null;
+
+            if (success) {
+                TextView welcome = (TextView) findViewById(R.id.textView);
+                welcome.setText("Добре дошли, " + name + "!!!");
+                TextView textViewScore = (TextView)findViewById(R.id.textViewScore);
+                textViewScore.setText("Точките Ви са: " + points);
+                if (mMainLanguage != null && mLangToLearn != null && !mMainLanguage.equals(mLangToLearn)) {
+                    Spinner spinnerMainLang = (Spinner) findViewById(R.id.spinnerMainLang);
+                    Spinner spinnerLangToLearn = (Spinner) findViewById(R.id.spinnerLangToLearn);
+                    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getBaseContext(),
+                            R.array.langs_array, android.R.layout.simple_spinner_item);
+                    spinnerMainLang.setSelection(adapter.getPosition(mMainLanguage));
+                    spinnerLangToLearn.setSelection(adapter.getPosition(mLangToLearn));
+                    floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            //Start the game /
+                            Intent myIntent = new Intent(MainActivity.this, FullscreenActivity.class);
+                            myIntent.putExtra("name", username); //Optional parameters
+                            MainActivity.this.startActivity(myIntent);
+
+                        }
+                });
+                }
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mInfoTask = null;
+        }
+    }
 
 }

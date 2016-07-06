@@ -19,7 +19,7 @@
         fab:menu_colorNormal="#DA4336"
         fab:menu_colorPressed="#E75043"
         fab:menu_colorRipple="#99d4d4d4"
-        fab:menu_fab_label="Choose what to do"
+        fab:menu_fab_label="Избери активност"
         fab:menu_fab_size="normal"
         fab:menu_icon="@drawable/play"
         fab:menu_labels_colorNormal="#333"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/game"
-            fab:fab_label="Start game"
+            fab:fab_label="Стартирай играта"
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/statistics"
-            fab:fab_label="Statistics"
+            fab:fab_label="Статистика"
             fab:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 </RelativeLayout>

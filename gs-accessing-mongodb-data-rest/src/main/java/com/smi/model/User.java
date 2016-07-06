@@ -13,7 +13,7 @@ public class User {
 	String name;
 	String username;
 	String email;
-	String password;
+	public String password;
 	String mainLanguage;
 	String langToLearn;
 	Map<Language, ArrayList<Integer>> answCorrWords;
@@ -29,13 +29,17 @@ public class User {
 		setUsername(username);
 		setEmail(email);
 		setPassword(password);
-//		setPassword(password);
-		setRepeatWronWords(false);
-//		setScore(score);
-//		answCorrWords = new HashMap<Language, ArrayList<Integer>>();
-//		answWrongWords = new HashMap<Language, ArrayList<Integer>>();
-//		answCorrWords.keySet().addAll(Language.availableLanguages);
-//		answWrongWords.keySet().addAll(Language.availableLanguages);
+
+
+	}
+	
+	public User(String name, String username,
+			String password) {
+		setName(name);
+		setUsername(username);
+		setPassword(password);
+
+
 	}
 	
 	public User(String name, String username, String email, double score, boolean repeatWords){
@@ -141,11 +145,13 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", username=" + username
-				+ ", email=" + email + ", password=" + password;
-//				+ ", mainLanguage=" + mainLanguage + ", langToLearn="
-//				+ langToLearn + ", answCorrWords=" + answCorrWords
+				+ ", email=" + email + ", password=" + password
+				+ ", mainLanguage=" + mainLanguage + ", langToLearn="
+				+ langToLearn + ", answCorrWords=" 
+				//+ answCorrWords
 //				+ ", answWrongWords=" + answWrongWords + ", repeatWronWords="
-//				+ repeatWronWords + ", score=" + score + "]";
+//				+ repeatWronWords 
+				+ ", score=" + score + "]";
 	}
 	
 	

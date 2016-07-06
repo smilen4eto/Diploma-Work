@@ -22,12 +22,12 @@ public class CRUDUser {
 	}
 	
 	public static void updateUserScore(String username, double score){
-		Connector.usersColl.update(new BasicDBObject("name", username),
+		Connector.usersColl.update(new BasicDBObject("username", username),
 		        new BasicDBObject("$set", new BasicDBObject("score", score)));
 	}
 	
 	public static void updateUserRepeatWords(String username, boolean repeatWords){
-		Connector.usersColl.update(new BasicDBObject("name", username),
+		Connector.usersColl.update(new BasicDBObject("username", username),
 		        new BasicDBObject("$set", new BasicDBObject("repeatWrWords", repeatWords)));
 	}
 		
@@ -49,26 +49,19 @@ public class CRUDUser {
 		return user;
 	}
 	
-	//used to verify correct user name and password
-	public static void findUserByUnameAndPassword(){
-		//maybe not necessary
-	}
-	
-	public static void addWrongWord(){
-		
-	}
-	
-	public static void addCorrectWord(){
-		
-	}
-	
-	public static void removeWrongOrCorrectWord(){
-		
-	}
-
 	public static DBObject findUserByEmail(String email) {
 		DBObject user = Connector.usersColl.findOne(new BasicDBObject("mail", email));
 		return user;
+		
+	}
+
+	public static void updateUserSettings(User currentUser,String password) {
+		Connector.usersColl.update(new BasicDBObject("username", currentUser.getUsername()),
+		new BasicDBObject("$set", new BasicDBObject()
+		.append("name", currentUser.getName())));
+		Connector.usersColl.update(new BasicDBObject("username", currentUser.getUsername()),
+		new BasicDBObject("$set", new BasicDBObject()
+		.append("password",password)));
 		
 	}
 }

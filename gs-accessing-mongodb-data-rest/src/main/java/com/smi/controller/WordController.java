@@ -2,6 +2,7 @@ package com.smi.controller;
 
 import java.util.List;
 
+import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,13 +38,13 @@ public class WordController {
 	
 	//TBD!!!!!!!!
      
-    @RequestMapping(value = "/word/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/word/{username}", method = RequestMethod.GET)
     public ResponseEntity<Word> getWord(@PathVariable("username") String username) {
         System.out.println("Fetching Word for user " + username);
-        Word word = WordService.returnWordForGame("", username);
-        if (word == null) {
-            System.out.println("Word " + "" + "does not exist");
-            return new ResponseEntity<Word>(HttpStatus.NOT_FOUND);
+        Word word = null;
+        //word = WordService.returnWordForGame("", username);
+        while(word == null){
+            word = WordService.returnWordForGame("", username);
         }
         return new ResponseEntity<Word>(word, HttpStatus.OK);
     }
@@ -104,7 +105,4 @@ public class WordController {
         return new ResponseEntity<Word>(HttpStatus.NO_CONTENT);
     }
  
-     
- 
-
 }

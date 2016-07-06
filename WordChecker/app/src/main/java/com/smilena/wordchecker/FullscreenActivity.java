@@ -1,20 +1,44 @@
 package com.smilena.wordchecker;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import sessionManager.SessionManager;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
+    public String username;
+    public String mainLanguage;
+    public String langToLearn;
+    public Double score;
+    SessionManager session;
+    private WordSelectionTask mAuthTask = null;
+
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -86,11 +110,40 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+            session = new SessionManager(getApplicationContext());
+            session.checkLogin();
+            username = session.getUserDetails().get("name");
+//            Intent intent = getIntent();
+//            String value = intent.getStringExtra("json");
+
+
+        try {
+//            String value = RESTConnector.connectToHTTGet(String.format("%s%s", UrlKeeper.getUserInfo, username));
+//                JSONObject jobj = new JSONObject(value);
+//                //username = jobj.get("username").toString();
+//                Log.e("usernameeeeee",username);
+//                score = (double)jobj.get("score");
+//                Log.e("scoreeee",""+jobj.get("score"));
+//                mainLanguage = jobj.get("mainLanguage").toString();
+//                langToLearn = jobj.get("langToLearn").toString();
+                if (mAuthTask != null) {
+                    return;
+                } else {
+                    mAuthTask = new WordSelectionTask(username);
+                    mAuthTask.execute((Void) null);
+                }
+
+            //repeatWronWords = jobj.getBoolean("repeatWronWords");
+        } catch (Exception e){
+            Log.e("Exception", e.toString());
+        }
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_fullscreen);
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -136,6 +189,14 @@ public class FullscreenActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent myIntent = new Intent(FullscreenActivity.this, MainActivity.class);
+        myIntent.putExtra("name", username);
+        FullscreenActivity.this.startActivity(myIntent);
+
+    }
+
     private void toggle() {
         if (mVisible) {
             hide();
@@ -178,4 +239,176 @@ public class FullscreenActivity extends AppCompatActivity {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+
+
+
+    public class WordSelectionTask extends AsyncTask<Void, Void, Boolean> implements View.OnClickListener{
+        String json;
+        private  String mLangToLearn;
+        private  String mMainLanguage;
+        private final String mUsername;
+        public  double mPoints;
+        public HashMap<String, Boolean> words = new HashMap<String, Boolean>();
+
+
+        WordSelectionTask(String username) {
+//            mLangToLearn = langToLearn;
+//            mMainLanguage = mainLang;
+            mUsername = username;
+//            mPoints = points;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String value = RESTConnector.connectToHTTGet(String.format("%s%s", UrlKeeper.getUserInfo, username));
+            try {
+                JSONObject jobj = new JSONObject(value);
+                //username = jobj.get("username").toString();
+                Log.e("usernameeeeee",username);
+                mPoints = (double)jobj.get("score");
+                Log.e("scoreeee",""+jobj.get("score"));
+                mMainLanguage = jobj.get("mainLanguage").toString();
+                mLangToLearn = jobj.get("langToLearn").toString();
+            } catch (Exception e){
+                Log.e("Exception in get user", e.toString());
+            }
+
+            String url = UrlKeeper.getWord+mUsername;
+            String result = RESTConnector.connectToHTTGet(url);
+            if (result != null) {
+                json = result;
+                return true;
+
+            } else {
+//                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            String mainLang = "";
+            if (success) {
+                try {
+                    JSONObject jobj = new JSONObject(json);
+                    mainLang = jobj.get("wordInMainLanguage").toString();
+
+                    JSONObject current = (JSONObject) jobj.get("word");
+
+                    ArrayList<String> arr = new ArrayList();
+                    for (int i = 0; i < current.names().length(); i++) {
+                        arr.add(current.names().get(i).toString());
+                        words.put(current.names().get(i).toString(), (Boolean)current.get(current.names().get(i).toString()));
+                    }
+
+                    ((TextView) findViewById(R.id.fullscreen_content)).setText(mainLang);
+                    ((Button) findViewById(R.id.button)).setText(arr.get(0));
+                    ((Button) findViewById(R.id.button)).setOnClickListener(this);
+                    ((Button) findViewById(R.id.button1)).setText(arr.get(1));
+                    ((Button) findViewById(R.id.button1)).setOnClickListener(this);
+
+                    ((Button) findViewById(R.id.button2)).setText(arr.get(2));
+                    ((Button) findViewById(R.id.button2)).setOnClickListener(this);
+
+                    ((Button) findViewById(R.id.button3)).setText(arr.get(3));
+                    ((Button) findViewById(R.id.button3)).setOnClickListener(this);
+
+
+                    //Log.e(current.get(arr.get(0)).toString(), "Resultttttttnfdgkjfdnd");
+
+                }catch (Exception e){
+                    Log.e("Exception", e.toString());
+                }
+
+
+            } else {
+                //Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                ((TextView) findViewById(R.id.fullscreen_content)).setText("");
+                ((Button) findViewById(R.id.button)).setText("");
+                ((Button) findViewById(R.id.button1)).setText("");
+                ((Button) findViewById(R.id.button2)).setText("");
+                ((Button) findViewById(R.id.button3)).setText("");
+
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(words.get(((Button)v).getText()) == true){
+                mPoints = mPoints + 10;
+                updateUser(mPoints);
+                Toast.makeText(getApplicationContext(), "Вярно! :) ", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Грешно! :(", Toast.LENGTH_SHORT).show();
+            }
+            mAuthTask = new WordSelectionTask(username);
+            mAuthTask.execute((Void) null);
+
+        }
+
+        @Override
+        protected void onCancelled() {
+
+        }
+
+        void updateUser(double score){
+
+            UserUpdatingTask uptTask = new UserUpdatingTask(username,score);
+            uptTask.execute((Void) null);
+        }
+    }
+
+    public class UserUpdatingTask extends AsyncTask<Void, Void, Boolean>{
+
+        private final String mUsername;
+        private final Double mPoints;
+
+
+        UserUpdatingTask(String username, double points) {
+            mUsername = username;
+            mPoints = points;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            String url = UrlKeeper.putUpdate;
+            JSONObject json = new JSONObject();
+            try {
+                json.put("username", mUsername);
+                json.put("score", mPoints);
+            }catch (Exception e){
+                Log.e("JSON creation exception", e.getMessage());
+            }
+            String result = RESTConnector.connectToHTTPut(url,json);
+            if (result != null) {
+                return true;
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+            Toast.makeText(getApplicationContext(), "Точките ти са "+mPoints, Toast.LENGTH_SHORT).show();
+
+            } else {
+
+                Toast.makeText(getApplicationContext(), "Грешка, моля опитайте отново", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+        @Override
+        protected void onCancelled() {
+
+        }
+
+    }
+
+
 }

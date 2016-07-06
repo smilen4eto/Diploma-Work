@@ -35,7 +35,7 @@
         android:layout_width="351dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Choose main language"
+        android:text="Избери главен език"
         android:id="@+id/textView2"
         android:layout_marginTop="15dp"/>
 
@@ -51,7 +51,7 @@
         android:layout_width="355dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Choose language to learn"
+        android:text="Избери език за научаване"
         android:id="@+id/textView3"
         android:layout_marginTop="15dp" />
 
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content"
         style="?android:textAppearanceSmall"
         android:layout_marginTop="15dp"
-        android:text="Save preferences"
+        android:text="Запази"
         android:id="@+id/btnSave"
         android:clickable="true" />
 

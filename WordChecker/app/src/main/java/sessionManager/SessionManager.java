@@ -12,8 +12,7 @@ import android.content.SharedPreferences.Editor;
 
 import com.smilena.wordchecker.LoginActivity;
 
-public class SessionManager {
-    // Shared Preferences
+public class SessionManager {    // Shared Preferences
     SharedPreferences pref;
 
     // Editor for Shared preferences

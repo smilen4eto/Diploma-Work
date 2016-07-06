@@ -2,6 +2,7 @@ package com.smi.mongo;
 
 
 
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.smi.model.Word;
@@ -37,8 +38,18 @@ public class CRUDWord {
 //		
 //	}
 
+	public static DBObject findWord(String wordInEn) {
+		DBObject match = Connector.wordColl.findOne(new BasicDBObject("wordInEn", wordInEn));
+		return match;
+	}
+	
 	public static DBObject findWordByEnglishDefinition(String wordInEnglish) {
-		DBObject word = Connector.wordColl.findOne(new BasicDBObject("wordInEn", wordInEnglish));
+		DBObject match = new BasicDBObject("$sample", new BasicDBObject("size", 1));
+		AggregationOutput output = Connector.wordColl.aggregate(match);
+		DBObject word = null;
+		for (DBObject result : output.results()) {
+			 word = result;
+			 }
 		return word;
 	}
 

@@ -187,18 +187,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+            mPasswordView.setError("Паролата е твърде кратка");
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
+            mEmailView.setError("Полето е задължително");
             focusView = mEmailView;
             cancel = true;
         } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+            mEmailView.setError("Невалидна поща");
             focusView = mEmailView;
             cancel = true;
         }
@@ -217,12 +217,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -347,7 +345,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     JSONObject jobj;
                     jobj = new JSONObject(result);
                     session.createLoginSession(jobj.get("username").toString(), mEmail);
-                    // Staring MainActivity
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     i.putExtra("name", result.toString());
                     startActivity(i);
@@ -380,7 +377,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success) {
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.setError("Грешна парола");
                 mPasswordView.requestFocus();
             }
         }
